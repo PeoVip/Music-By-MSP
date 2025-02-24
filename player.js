@@ -99,7 +99,7 @@ function initializePlayer(client) {
                 iconURL: musicIcons.playerIcon,
                 url: config.SupportServer
             })
-            .setFooter({ text: `Developed by Penhfgold_ | Bình Gold Rep 1:1`, iconURL: musicIcons.heartIcon })
+            .setFooter({ text: `Developed by SSRR | Prime Music v1.2`, iconURL: musicIcons.heartIcon })
             .setTimestamp()
             .setDescription(  
                 `- **Title:** [${track.info.title}](${track.info.uri})\n` +
@@ -126,7 +126,7 @@ function initializePlayer(client) {
             console.error("Error creating or sending music card:", error.message);
             const errorEmbed = new EmbedBuilder()
                 .setColor('#FF0000')
-                .setDescription("⚠️ **Không thể tải thẻ theo dõi. Tiếp tục phát lại...**");
+                .setDescription("⚠️ **Unable to load track card. Continuing playback...**");
             await channel.send({ embeds: [errorEmbed] });
         }
     });
@@ -156,17 +156,17 @@ function initializePlayer(client) {
     
                 if (!nextTrack) {
                     player.destroy();
-                    await channel.send("⚠️ **Không còn bản nhạc nào để tự động phát. Đang ngắt kết nối...**");
+                    await channel.send("⚠️ **No more tracks to autoplay. Disconnecting...**");
                 }
             } else {
                 console.log(`Autoplay is disabled for guild: ${guildId}`);
                 player.destroy();
-                await channel.send("🎶 **Hàng đợi đã kết thúc. Tự động phát bị tắt.**");
+                await channel.send("🎶 **Queue has ended. Autoplay is disabled.**");
             }
         } catch (error) {
             console.error("Error handling autoplay:", error);
             player.destroy();
-            await channel.send("👾**Hàng đợi trống! Đang ngắt kết nối...**");
+            await channel.send("👾**Queue Empty! Disconnecting...**");
         }
     });
     
@@ -217,7 +217,7 @@ function setupCollector(client, player, channel, message) {
         if (!voiceChannel || voiceChannel.id !== playerChannel) {
             const vcEmbed = new EmbedBuilder()
                 .setColor(config.embedColor)
-                .setDescription('🔒 **Bạn cần ở trong cùng một kênh thoại để sử dụng các điều khiển!**');
+                .setDescription('🔒 **You need to be in the same voice channel to use the controls!**');
             const sentMessage = await channel.send({ embeds: [vcEmbed] });
             setTimeout(() => sentMessage.delete().catch(console.error), config.embedTimeout * 1000);
             return;
@@ -240,7 +240,7 @@ async function handleInteraction(i, player, channel) {
             break;
         case 'skipTrack':
             player.stop();
-            await sendEmbed(channel, "⏭️ **Bài hát tiếp theo sẽ được chơi**");
+            await sendEmbed(channel, "⏭️ **Player will play the next song!**");
             break;
         case 'disableLoop':
             disableLoop(player, channel);
@@ -250,27 +250,27 @@ async function handleInteraction(i, player, channel) {
             break;
         case 'clearQueue':
             player.queue.clear();
-            await sendEmbed(channel, "🗑️ **Hàng đợi đã được xóa!**");
+            await sendEmbed(channel, "🗑️ **Queue has been cleared!**");
             break;
         case 'stopTrack':
             player.stop();
             player.destroy();
-            await sendEmbed(channel, '⏹️ **Quá trình phát lại đã bị dừng và trình phát bị hủy!**');
+            await sendEmbed(channel, '⏹️ **Playback has been stopped and player destroyed!**');
             break;
         case 'pauseTrack':
             if (player.paused) {
-                await sendEmbed(channel, '⏸️ **Phát lại đã bị tạm dừng!**');
+                await sendEmbed(channel, '⏸️ **Playback is already paused!**');
             } else {
                 player.pause(true);
-                await sendEmbed(channel, '⏸️ **Phát lại đã bị tạm dừng!**');
+                await sendEmbed(channel, '⏸️ **Playback has been paused!**');
             }
             break;
         case 'resumeTrack':
             if (!player.paused) {
-                await sendEmbed(channel, '▶️ **Quá trình phát lại đã được tiếp tục!**');
+                await sendEmbed(channel, '▶️ **Playback is already resumed!**');
             } else {
                 player.pause(false);
-                await sendEmbed(channel, '▶️ **Quá trình phát lại đã được tiếp tục!**');
+                await sendEmbed(channel, '▶️ **Playback has been resumed!**');
             }
             break;
         case 'volumeUp':
@@ -291,7 +291,7 @@ async function sendEmbed(channel, message) {
 function adjustVolume(player, channel, amount) {
     const newVolume = Math.min(100, Math.max(10, player.volume + amount));
     if (newVolume === player.volume) {
-        sendEmbed(channel, amount > 0 ? '🔊 **Âm lượng đã ở mức tối đa!**' : '🔉 **Âm lượng đã ở mức tối thiểu!**');
+        sendEmbed(channel, amount > 0 ? '🔊 **Volume is already at maximum!**' : '🔉 **Volume is already at minimum!**');
     } else {
         player.setVolume(newVolume);
         sendEmbed(channel, `🔊 **Volume changed to ${newVolume}%!**`);
@@ -312,12 +312,12 @@ function formatTrack(track) {
 
 function toggleLoop(player, channel) {
     player.setLoop(player.loop === "track" ? "queue" : "track");
-    sendEmbed(channel, player.loop === "track" ? "🔁 **Track loop is activated!**" : "🔁 **Vòng lắp của hàng chờ đang hoạt động!**");
+    sendEmbed(channel, player.loop === "track" ? "🔁 **Track loop is activated!**" : "🔁 **Queue loop is activated!**");
 }
 
 function disableLoop(player, channel) {
     player.setLoop("none");
-    sendEmbed(channel, "❌ **Vòng lặp bị vô hiệu hóa!**");
+    sendEmbed(channel, "❌ **Loop is disabled!**");
 }
 
 function showQueue(channel) {
